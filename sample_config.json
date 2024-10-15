@@ -1,0 +1,4 @@
+{
+  "client_secret": "<stripe_platform_client_secret>",
+  "account_id": "<stripe_account_id>"
+}
