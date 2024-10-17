@@ -1124,21 +1124,26 @@ def sync():
     The sync function called for the sync mode.
     """
     # Write all schemas and init count to 0
+    selected_stream = Context.config.get("selected_stream")
     for catalog_entry in Context.catalog['streams']:
         stream_name = catalog_entry["tap_stream_id"]
-        if Context.is_selected(stream_name):
+        LOGGER.info(f"----- sync - stream_name: line 1129 {stream_name}")
+        if Context.is_selected(stream_name) or stream_name == selected_stream:
+        # if Context.is_selected(stream_name):
             singer.write_schema(stream_name,
                                 catalog_entry['schema'],
                                 catalog_entry['key_properties'])
 
             Context.new_counts[stream_name] = 0
             Context.updated_counts[stream_name] = 0
-            LOGGER.info(f"----------{stream_name}")
+            LOGGER.info(f"----- stream_name: {stream_name}")
 
     # Loop over streams in catalog
     for catalog_entry in Context.catalog['streams']:
         stream_name = catalog_entry['tap_stream_id']
-        if Context.is_selected(stream_name):
+        if Context.is_selected(stream_name) or stream_name == selected_stream:
+        # if Context.is_selected(stream_name):
+            LOGGER.info(f"----- stream_name 2 1145: {stream_name}")
             # Run the sync for only parent streams/only child streams/both parent-child streams
             if not Context.is_sub_stream(stream_name) or not is_parent_selected(stream_name):
                 sync_stream(stream_name, Context.is_sub_stream(stream_name))
@@ -1179,10 +1184,13 @@ def main():
     Context.config = args.config
     Context.state = args.state
     configure_stripe_client()
+    LOGGER.info(f"----- args.discover: line 1184 {Context.state}, {Context.config}")
 
     # If discover flag was passed, run discovery mode and dump output to stdout
+    LOGGER.info(f"----- configure_stripe_client: line 1187 {args.discover}, {args}")
     if args.discover:
         catalog = discover()
+        LOGGER.info(f"----- catalog: line 1190 {catalog}")
         print(json.dumps(catalog, indent=2))
     # Otherwise run in sync mode
     else:
@@ -1199,6 +1207,7 @@ def main():
             Context.catalog = args.catalog.to_dict()
         else:
             Context.catalog = discover()
+            LOGGER.info(f"----- ontext.catalog: line 1207 {Context.catalog}")
 
         try:
             sync()
