@@ -1209,6 +1209,7 @@ def main():
             Context.catalog = discover()
             LOGGER.info(f"----- ontext.catalog: line 1207 {Context.catalog}")
 
+        LOGGER.info("----- Long start git---")
         try:
             sync()
         finally:
